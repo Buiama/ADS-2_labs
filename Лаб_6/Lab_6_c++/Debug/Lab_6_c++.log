@@ -1,0 +1,10 @@
+﻿  Lab_6_c++.cpp
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Template.h(79,16): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Template.h(77): message : во время компиляции функции-члена класс шаблон "void TTree<char>::printLevelOrder(TTree<char> *)"
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Lab_6_c++.cpp(21): message : выполняется компиляция ссылки на экземпляр шаблон функции "void TTree<char>::printLevelOrder(TTree<char> *)"
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Lab_6_c++.cpp(9): message : выполняется компиляция ссылки на экземпляр класс шаблон функции "TTree<char>"
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Template.h(135,9): warning C4101: i: неиспользованная локальная переменная
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Template.h(134): message : во время компиляции функции-члена класс шаблон "void TTree<char>::horizontalPrint(TTree<char> *,int)"
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Lab_6_c++.cpp(25): message : выполняется компиляция ссылки на экземпляр шаблон функции "void TTree<char>::horizontalPrint(TTree<char> *,int)"
+C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Template.h(74): warning C4715: TTree<char>::find: значение возвращается не при всех путях выполнения
+  Lab_6_c++.vcxproj -> C:\Users\Пользователь\OneDrive\Документы\KPI\ОП\ОП-1\ОП-1-2\Лабы\Лаб_6\Lab_6_c++\Debug\Lab_6_c++.exe
