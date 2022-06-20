@@ -1,0 +1,7 @@
+﻿  Functions.cpp
+C:\Users\Пользователь\OneDrive\Документы\KPI\АСД\АСД-2\Лабы\Лаб_8\Lab_8_c++\Functions.cpp(60,17): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
+C:\Users\Пользователь\OneDrive\Документы\KPI\АСД\АСД-2\Лабы\Лаб_8\Lab_8_c++\Functions.cpp(79,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Пользователь\OneDrive\Документы\KPI\АСД\АСД-2\Лабы\Лаб_8\Lab_8_c++\Functions.cpp(90,23): warning C4018: <: несоответствие типов со знаком и без знака
+  Lab_8_c++.cpp
+  Создание кода...
+  Lab_8_c++.vcxproj -> C:\Users\Пользователь\OneDrive\Документы\KPI\АСД\АСД-2\Лабы\Лаб_8\Lab_8_c++\Debug\Lab_8_c++.exe
