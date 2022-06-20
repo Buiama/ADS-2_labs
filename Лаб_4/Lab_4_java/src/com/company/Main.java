@@ -25,9 +25,10 @@ public class Main {
             matrixToOutput = new int[topCount][topCount];
             for (int i = 0; i < topCount; i++) {
                 for (int j = 0; j < topCount; j++) {
-                    matrixWeight[i][j] = (int) (Math.random() * 101 + 1);
-                    matrixToOutput[i][j] = matrixWeight[i][j];
-                    /*if (i <= j) {
+                    // matrixWeight[i][j] = (int) (Math.random() * 101 + 1);
+                    // matrixToOutput[i][j] = matrixWeight[i][j];
+                    // або
+                    if (i <= j) {
                         random = (int) (Math.random() * 18);
                         if (random == 0) {
                             matrixWeight[i][j] = (int) (Math.random() * 101 + 1);
@@ -42,10 +43,11 @@ public class Main {
                             matrixWeight[j][i] = matrixWeight[i][j];
                             matrixToOutput[i][j] = matrixWeight[i][j];
                         } else {
+                            // або 0
                             matrixWeight[i][j] = (int) (Math.random() * 101 + 1);
                             matrixToOutput[i][j] = matrixWeight[i][j];
                         }
-                    }*/
+                    }
                     if (max < matrixWeight[i][j]) max = matrixWeight[i][j];
                 }
             }
