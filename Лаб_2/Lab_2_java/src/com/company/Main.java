@@ -1,290 +1,260 @@
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+package com.company;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
-import static java.lang.Integer.MAX_VALUE;
-
 public class Main {
+
     public static void main(String[] args) throws IOException {
-        System.out.println("Hello world!");
-        n=4;
-        File f0 = new File("name.txt");
-        polyphaseSort(counter());
-    }
-    public static long counter() throws FileNotFoundException {
-        long count=0;
-        File file = new File("name.txt");
-        Scanner sc = new Scanner(file);
-        int g;
-        while (sc.hasNextInt()){
-            g = sc.nextInt();
-            count++;
+        Scanner in = new Scanner(System.in); // для считывания с консоли
+        System.out.print("Name of text file: ");
+        String n = in.nextLine();
+        File file = new File(n+".txt"); // открываем заданный файл
+
+        Scanner scan = new Scanner(file); // для считывания с файла
+        int u = scan.nextInt();
+        System.out.println("\nU = "+u);
+        int m = scan.nextInt();
+        System.out.println("M = "+m);
+
+        int[][] matrixD = new int[u][m+1]; // считываем матрицу данных D
+        for(int i = 0; i < u; i++) {
+            for(int j = 0; j< m+1; j++) {
+                matrixD[i][j] = scan.nextInt();
+            }
         }
-        return count;
+
+        System.out.println("\nYour file:");
+        output(matrixD, u, m+1);
+
+        System.out.print("\nSome user number x =  ");
+        int x = in.nextInt();
+
+        int[][] matrix = new int[u-1][m]; // матрица с нужными данными (без нумерации и заданного пользователя)
+        for(int i = 0; i < x-1; i++) {
+            System.arraycopy(matrixD[i], 1, matrix[i], 0, m);
+            // for(int j = 0;j<m; j++) { matrix[i][j] = matrixD[i][j+1]; }
+        }
+        // чтобы без лишних условий, разобьем на два цикла
+        for(int i = x-1; i < u-1; i++) {
+            System.arraycopy(matrixD[i + 1], 1, matrix[i], 0, m);
+            // for(int j = 0; j<m; j++) { matrix[i][j] = matrixD[i+1][j+1]; }
+        }
+
+
+        System.out.println("\nNew matrix:");
+        output(matrix, u-1, m);
+
+        combSort(matrix, u-1, m, x, matrixD); // сортируем рассческой,
+        // потому что нет повторяющихся элементов, а значит устойчивость не нужна
+
+        System.out.println("\n\nComb sorted matrix:");
+        output(matrix,u-1,m);
+
+
+        int[][] inv = new int[u-1][2]; // финальная матрица с номером пользователя и кол-вом инверсий
+
+        for(int i = 0; i < x-1; i++) {
+            inversion = 0; // обнуляем счетчик инверсий
+            matrix[i] = mergeSort(matrix[i]); // сортируем слиянием и считаем инверсии
+            inv[i][0] = i+1; // нумерация пользователей
+            inv[i][1] = inversion;
+            System.out.print("\nInversions ["+(i+1)+"] = "+inversion);
+        }
+        // чтобы без лишних условий, разобьем на два цикла
+        for(int i = x-1; i < u-1; i++) {
+            inversion = 0;
+            matrix[i] = mergeSort(matrix[i]); // сортируем слиянием и считаем инверсии
+            inv[i][0] = i+2;
+            inv[i][1] = inversion;
+            System.out.print("\nInversions ["+(i+2)+"] = "+inversion);
+        }
+
+
+        bubbleSort(inv, u-1); // сортируем пузырьком,
+        // потому что есть повторяющиеся элементы, а значит устойчивость нужна, расческа не подойдет
+
+        System.out.println("\n\nBubble sorted array:");
+        output(inv, u-1, 2);
+
+        // записываем в файл
+        FileWriter writer = new FileWriter("ip15_Buialo_05_output_3.txt");
+        writer.write(x +"\n");
+        for(int i = 0; i < u-1; i++) {
+            for(int j = 0; j < 2; j++) {
+                writer.write(inv[i][j]+" ");
+            }
+            writer.write("\n");
+        }
+        writer.write(x +"");
+        writer.close(); // закрываем поток
     }
-    public static int n,j,l;
-    public static void select(int[] a, int[] d) {
-        int i,a0;
-        if((d[j])<(d[j+1])) j++;
-        else {
-            if(d[j]==0) {
-                l++;
-                a0=a[0];
-                for (i=0;i<n-1;i++) {
-                    d[i]=a0+a[i+1]-a[i];
-                    a[i] = a0 + a[i + 1];
+
+
+    public static void output(int[][] matrix, int n, int m) {
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                System.out.print(matrix[i][j]+" ");
+            }
+            System.out.println();
+        }
+    }
+
+
+    public static void combSort(int[][] matrix, int u, int m, int x, int[][] matrixD) {
+        int step;
+        double constant = 1.24733095;
+        int[] arrX = new int[m];
+
+        for(int i = 0; i < u; i++) {
+
+            System.arraycopy(matrixD[x - 1], 1, arrX, 0, m);
+            // for(int j=0; j<m; j++) { arrX[j] = matrixD[x-1][j+1];}
+            step = m;
+            while (step > 1) {
+                step = (int) (step/constant);
+                for(int j = 0; step+j < m; j++) {
+                    // сортируем списки пользователей, будто список пользователя х
+                    if(arrX[j] > arrX[j+step]) {
+                        matrix[i][j + step] += matrix[i][j]; // buf = matrix[i][j];
+                        matrix[i][j] = matrix[i][j + step] - matrix[i][j]; // matrix[i][j] = matrix[i][j+step];
+                        matrix[i][j + step] -= matrix[i][j]; // matrix[i][j+step] = buf;
+
+                        arrX[j + step] += arrX[j];
+                        arrX[j] = arrX[j + step] - arrX[j];
+                        arrX[j + step] -= arrX[j];
+                    }
                 }
             }
-            j=0;
         }
-        d[j] = d[j] - 1;
     }
-    public static void polyphaseSort(long eof) throws IOException {
-        int i, z, k, x, mx, min;
-        int tn,dn;
-        int[] a = new int[n];
-        int[] d = new int[n];
-        int[] t = new int[n];
-        int[] ta = new int[n];
-        File[] f = new File[n];
-        File f0 = new File("name.txt");
 
-        FileWriter[] in = new FileWriter[n];
 
-        for(i=0;i<n-1;i++) {
-            f[i] = new File("T"+(i+1)+".txt");
-            f[i].createNewFile();
-            in[i]= new FileWriter(f[i]);
-        }
-        f[n-1] = new File("T"+n+".txt");
-        f[n-1].createNewFile();
-        for(i=0;i<n-1;i++) {
-            a[i] = 1; d[i] = 1;
-        }
-        l = 1; j = 0; a[n-1] = 0; d[n-1] = 0;
+    public static void bubbleSort(int[][] inv, int u) {
+        int[] buf = new int[2];
+        int k = 0;
+        boolean isSorted = false; // проверка на отсортированность, залог естественности
 
-        BufferedReader reader = Files.newBufferedReader(f0.toPath(), StandardCharsets.UTF_8);
-        boolean eor;
-        int c=0;
-        String firstX, firstZ;
-        String[] firstY=new String[n];
-        firstX = reader.readLine();
-        do {
-            select(a,d);
-            eor=false;
-//            copyrun(f0,f[j]);
-            do {
-//                copy();
-                firstY[j]=firstX;
-//                System.out.println(j+" "+firstX);
-                in[j].write(firstX+'\n');
-                firstX = reader.readLine();
-                if(firstX!=null) {
-                    if (Integer.parseInt(firstX) < Integer.parseInt(firstY[j])) eor = true;
-                }
-                c++;
-//                System.out.println("c = "+c+" eof = "+eof);
-            } while (!eor && c!=eof);//!?
-        } while (c!=eof && (j!=n-2));//!?
-        j=0;
-//        System.out.println(c);
-        while (c!=eof) {//!? //c<eof
-            select(a,d);
-            if(Integer.parseInt(firstY[j]) <= Integer.parseInt(firstX)) {
-//            copyrun(f0,f[j]);
-                eor=false;
-                do {
-//                copy();
-                    firstY[j]=firstX;
-                    in[j].write(firstX+'\n');
-                    firstX = reader.readLine();
-//                System.out.println("firstX = "+firstX);
-                    if(firstX!=null) {
-                        if (Integer.parseInt(firstX) < Integer.parseInt(firstY[j])) eor = true;
+        while(!isSorted) { // идеальный пузырек личной разработки
+            isSorted = true;
+
+            for (int i = u - 1; i > k; i--) {//int i = 0; i <arr.length - k - 1; i++  тогда в свапе тоже с плюсом
+                if (inv[i - 1][1] > inv[i][1]) { // сортируем по второму столбцу матрицы (степень похожести)
+                    isSorted = false;
+
+                    for (int j = 0; j < 2; j++) {
+                        buf[j] = inv[i - 1][j];
+                        inv[i - 1][j] = inv[i][j];
+                        inv[i][j] = buf[j];
                     }
-                    c++;
-//                System.out.println("c = "+c+" eof = "+eof);
-                } while (!eor && c!=eof);//!?
-                if(c==eof) {//!?
-                    d[j]=d[j]+1;
                 }
-                else {
-//            copyrun(f0,f[j]);
-                    eor = false;
-                    do {
-//                copy();
-                        firstY[j]=firstX;
-                        in[j].write(firstX+'\n');
-                        firstX = reader.readLine();
-//                System.out.println("firstX = "+firstX);
-                        if(firstX!=null) {
-                            if (Integer.parseInt(firstX) < Integer.parseInt(firstY[j])) eor = true;
-                        }
-                        c++;
-//                System.out.println("c = "+c+" eof = "+eof);
-                    } while (!eor && c!=eof);//!?
-                }
+            }
+            k++;
+        }
+    }
+
+
+    private static int inversion = 0;
+
+    public static int[] merge(int[] left, int[] right) {
+        int i = 0, j = 0, k = 0;
+        int l = left.length;
+        int r = right.length;
+        int[] c = new int[l + r];
+
+        while (i < l || j < r) {
+            if (j == r || (i < l && left[i] <= right[j])) {
+                c[k] = left[i];
+                k++;
+                i++;
+                inversion += k - i; // считаем инверсии
             }
             else {
-//            copyrun(f0,f[j]);
-                eor = false;
-                do {
-//                copy();
-                    firstY[j]=firstX;
-                    in[j].write(firstX+'\n');
-                    firstX = reader.readLine();
-//                System.out.println("firstX = "+firstX);
-                    if(firstX!=null) {
-                        if (Integer.parseInt(firstX) < Integer.parseInt(firstY[j])) eor = true;
-                    }
-                    c++;
-//                System.out.println("c = "+c+" eof = "+eof);
-                } while (!eor && c!=eof);//!?
+                c[k] = right[j];
+                k++;
+                j++;
             }
         }
-reader.close();
-        BufferedReader[] readers = new BufferedReader[n];
-        for(i=0;i<n-1;i++) {//!!!
-            in[i].close();
-            t[i] = i;
-////            startRead();
-            readers[i] = Files.newBufferedReader(f[i].toPath(), StandardCharsets.UTF_8);
+        return c;
+    }
+
+
+    public static int[] mergeSort(int[] array) {
+        int a = array.length;
+        if (a == 1) return array;
+        int k = 0; // счетчик задействуется и в левой части, и в правой
+
+        int[] left = new int[a/2]; // new int[(int) Math.ceil(a / 2)];
+        for (int i = 0; i < left.length; i++) {
+            left[i] = array[k];
+            k++;
         }
-        t[n-1] = n-1;
 
-//        for(i=0;i<n;i++) {
-//            in[i]= new FileWriter(f[i]);
-//        }
-int minTmp, close;
-        close=t[n-1];
-        for(i=0;i<n-1;i++) {
-            firstY[i]=readers[i].readLine();
+        int[] right = new int[a - left.length];
+        for (int i = 0; i < right.length; i++) {
+            right[i] = array[k];
+            k++;
         }
-        do {
-            in[t[n-1]]= new FileWriter(f[t[n-1]]);
-            z=a[n-2]; d[n-1]=0;
-//            for(i=0;i<n;i++) {
-//                System.out.println(t[i]);
-//            }
-//            for(i=0;i<n-1;i++) {
-//                firstY[i]=readers[i].readLine();
-//            }
-            do {
-                k = 0;
-                for (i = 0; i < n - 1; i++) {//!!!
-                    if (d[i] > 0) {
-                        d[i] = d[i] - 1;
-                    } else {
-                        ta[k] = t[i]; k = k + 1;
-                    }
-                }
-                if (k == 0) {
-                    d[n-1] = d[n-1] + 1;
-                }
-                else {
-                    do {
-//                        if(l==1){
-//                            readers[2] = Files.newBufferedReader(f[t[close]].toPath(), StandardCharsets.UTF_8);
-//                            in[t[n-1]].write(readers[2].readLine()+"");
-//                            in[t[n-1]].close();
-//                        }
-                        for(i=0;i<n;i++) {
-                            System.out.println("ta["+i+"] = "+ta[i]);
-                        }
-                        System.out.println("k = "+k);
-                        eor=false;
-                        i = 0; mx = 0; min = Integer.parseInt(firstY[ta[0]]); //f[ta[0]].first;
-                        System.out.println("in file T"+(i+1)+" min = "+min);
-                        while (i < k) {
-                            i = i + 1; x = Integer.parseInt(firstY[ta[i]]);//????
-                            System.out.println("in file T"+(i+1)+" x = "+x);
-                            if (x < min) {
-                                min = x; mx = i;
-                                System.out.println("New min = "+min);
-                            }
-                        }
-                        System.out.println("Final min is "+min);
-//                        copy(f[ta[mx]],f[t[n-1]]);
-                        System.out.println("mx = "+mx+"; file with min value T"+(ta[mx]+1));
-//                        firstX=readers[ta[mx]].readLine();
-//                        firstZ=firstX;
-                        in[t[n-1]].write(min+"\n");
-                        System.out.println(min+" wrote to T4");
-//                        firstY[mx]= String.valueOf(min);
-                        firstY[ta[mx]]= readers[ta[mx]].readLine();
-                        System.out.println("New arr of firstY:");
-                        for(i=0;i<n;i++) {
-                            System.out.println("firstY["+i+"] = "+firstY[i]);
-                        }
-//                        eor=false;
-                        if(firstY[ta[mx]]!=null) {
-                            System.out.println("mx = "+mx);
-                            if (min > Integer.parseInt(firstY[ta[mx]])) {
-                                eor = true;
-//                                firstY[ta[mx]]= String.valueOf(MAX_VALUE);
-                            }
-                        }
-                        else {
-                            firstY[ta[mx]]= String.valueOf(MAX_VALUE);
-                            eor=true;
-                        }
-                        System.out.println(eor);
-//нужно как-то  сохранять значения, а когда нужно менять
-                        if (eor) {
-                            System.out.println("Seria stopped!");
-                            ta[mx]=ta[k];
-//                            for (int tx = mx; tx < k; tx++) {
-//                                ta[tx] = ta[tx + 1];
-//                            }
-                            k = k - 1;
-                        }
-                        System.out.println();
-                    } while (k != 0);
-                }
-                System.out.println("k != "+k);
-                z = z - 1;
-                System.out.println("z = "+z);
-                System.out.println();
-                System.out.println();
-            }while (z!=0);
-            tn=t[n-1];dn=d[n-1];z=a[n-2];
-            for (i=n-1;i>0;i--) {
-                t[i]=t[i-1];d[i]=d[i-1];a[i]=a[i-1]-z;
-            }
-            t[0]=tn;d[0]=dn;a[0]=z;
-//            in[t[0]].write(t[n-1]);
-            l=l-1;
-            in[close].close();
-//            Scanner sc = new Scanner(System.in);
-//            sc.nextInt();
-//            for(i=0;i<n;i++) {
-//                System.out.println("t["+i+"] = "+t[i]);
-//            }
-            readers[t[n-1]].close();
-            readers[close] = Files.newBufferedReader(f[close].toPath(), StandardCharsets.UTF_8);
-            firstY[close] = readers[close].readLine();
-            close=t[n-1];
-            System.out.println("New arr of firstY:");
-            for(i=0;i<n;i++) {
-                System.out.println("firstY["+i+"] = "+firstY[i]);
-            }
 
-//            readers[close].close();
-//            readers[close] = Files.newBufferedReader(f[close].toPath(), StandardCharsets.UTF_8);
-//            for(i=0;i<=n-1;i++) {//!!!
-////            readers[i].close();
-//                in[i].close();
-//            }
-        } while (l!=0);
-        System.out.println("I`m here!");
+        left = mergeSort(left);
+        right = mergeSort(right);
 
-
-//        for(i=0;i<=n-1;i++) {//!!!
-////            readers[i].close();
-//            in[i].close();
-//        }
-        in[n-1].close();
-        System.out.println("Sorted in file T"+(t[0]+1));
+        return merge(left, right);
     }
 }
+
+
+
+//Рассческа для сортировки массива с инверсиями
+/*int step = u-1;
+double constant = 1.24733095;
+
+while (step>1) {
+    step = (int) (step/constant);
+    for(int i = 0; step+i<u-1; i++) {
+        if(inv[i][1]>inv[i+step][1]) {
+            for (int j = 0; j < 2; j++) {
+                buf[j] = inv[i][j];
+                inv[i][j] = inv[i+step][j];
+                inv[i+step][j] = buf[j];
+            }
+        }
+    }
+}*/
+
+
+// Пузырёк для сортировки массива по заданному пользователю
+/*int k; // int buf;
+int comparison = 0, swap = 0;
+boolean isSorted; // проверка на отсортированность, залог естественности
+for(int i=0;i<u;i++) {
+    k = -1;
+    isSorted = false;
+    while (!isSorted) { // идеальный пузырек личной разработки
+        isSorted = true;
+        k++;// самодельный счетчик
+
+        for (int j = 1; j < m - k; j++) {
+            comparison++; // кол-во сравнений
+            if (arr[w - 1][j] > arr[w - 1][j + 1]) {
+                isSorted = false; // если без/c использования третьей переменной:
+
+                arr[i][j + 1] += arr[i][j]; // buf = arr[i][j];
+                arr[i][j] = arr[i][j + 1] - arr[i][j]; // arr[i][j] = arr[i][j+1];
+                arr[i][j + 1] -= arr[i][j]; // arr[i][j+1] = buf;
+                swap++; // кол-во перестановок
+                if(i!=w-1) {
+                    arr[w - 1][j + 1] += arr[w - 1][j];
+                    arr[w - 1][j] = arr[w - 1][j + 1] - arr[w - 1][j];
+                    arr[w - 1][j + 1] -= arr[w - 1][j];
+                }
+            }
+        }
+    }
+
+    for(int j = 1; j < m+1; j++) { //System.arraycopy(arrW, 0, arr[w - 1], 1, m + 1 - 1);
+        arr[w-1][j]=arrW[j-1];
+    }
+}*/
